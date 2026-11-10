@@ -1,16 +1,38 @@
-## Hi there 👋
+name: Generate Snake
 
-<!--
-**Abdullah-m416/Abdullah-m416** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+on:
+  # run automatically every 12 hours
+  schedule:
+    - cron: "0 */12 * * *"
 
-Here are some ideas to get you started:
+  # allow manual runs from the Actions tab
+  workflow_dispatch:
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+  # run on every push to the main branch
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Generate snake animation
+        uses: Platane/snk/svg-only@v3
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          outputs: |
+            dist/snake.svg?color_snake=#D4FF24&color_dots=#0b1220,#102a5c,#1558C9,#5b8def,#D4FF24
+
+      - name: Push snake to the output branch
+        uses: crazy-max/ghaction-github-pages@v3.1.0
+        with:
+          target_branch: output
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
